@@ -1,0 +1,94 @@
+:root {
+    /* Paleta de colores */
+    --azul-principal: #2C3E50;
+    --azul-hover: #1f2d3a;
+    --blanco: #FFFFFF;
+    --gris-claro: #ECF0F1;
+    --sombra-tarjeta: rgba(0, 0, 0, 0.1);
+
+    /* Variables de transición para animaciones fluidas */
+    --transicion-suave: all 0.3s ease;
+}
+
+/*Ajustes y fondo general */
+body {
+    min-height: 100vh;
+    background-color: var(--blanco);
+    font-family: Arial, Helvetica, sans-serif;
+
+    /* Centrado perfecto mediante Flexbox */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/*Tipografías y Encabezados */
+h1,
+h2,
+h3,
+h4 {
+    color: var(--azul-principal);
+    margin-top: 0;
+}
+
+.titulo-sistema {
+    color: var(--azul-principal);
+    font-weight: 600;
+}
+
+/*Componente: Tarjeta del sistema */
+.card-sistema {
+    background-color: var(--blanco);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px var(--sombra-tarjeta);
+}
+
+/* 4. Componente: Botones */
+.btn-principal {
+    background-color: var(--azul-principal);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transicion-suave);
+}
+
+.btn-principal:hover {
+    background-color: var(--azul-hover);
+    color: var(--blanco);
+}
+
+/*Componente: Campos de formulario */
+.form-control {
+    background-color: var(--gris-claro);
+    border: 1px solid transparent;
+    /* Reserva el espacio del borde para evitar saltos bruscos al hacer focus */
+    transition: var(--transicion-suave);
+}
+
+.form-control:focus {
+    background-color: var(--gris-claro);
+    border-color: var(--azul-principal);
+    box-shadow: none;
+    outline: none;
+}
+
+/*Identidad Visual (Logo e Imagen) */
+.logo {
+    color: var(--azul-principal);
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-img {
+    display: block;
+    width: 140px;
+    height: auto;
+    margin: 0 auto 5px auto;
+}
