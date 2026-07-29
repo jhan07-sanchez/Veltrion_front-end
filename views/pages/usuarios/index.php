@@ -29,7 +29,7 @@ require_once __DIR__ . '../../../layout/sidebar.php';
     <!-- Main content -->
     <div class="content">
         <div class="container-fluid">
-            
+
             Contenido de la Lista de Usuarios
 
         </div><!-- /.container-fluid -->
