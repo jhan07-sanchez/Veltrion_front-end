@@ -1,72 +1,81 @@
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a href="<?php echo $URL; ?>index.php" class="brand-link">
-                <img src="<?php echo $URL; ?>public/assets/image/logo.png" alt="Veltrion Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">Veltrion</span>
-            </a>
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
 
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block">Jhan Snaider</a>
-                    </div>
-                </div>
+    <!-- Brand Logo -->
+    <a href="<?php echo $URL; ?>index.php" class="brand-link">
 
-                <!-- SidebarSearch Form -->
-                <div class="form-inline">
-                    <div class="input-group" data-widget="sidebar-search">
-                        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                        <div class="input-group-append">
-                            <button class="btn btn-sidebar">
-                                <i class="fas fa-search fa-fw"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <img src="<?php echo $URL; ?>public/assets/image/logo.png"
+            class="brand-image img-circle elevation-3"
+            style="opacity:.8">
 
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-                        <li class="nav-item menu-open">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Usuarios
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="<?php echo $URL; ?>views/pages/usuarios/" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Lista de Usuarios</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="<?php echo $URL; ?>views/pages/usuarios/crear.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Crear Usuario</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $URL ?>views/pages/auth/logout.php" class="nav-link">
-                                <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>Cerrar Sesión</p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
+        <span class="brand-text font-weight-light">
+            Veltrion
+        </span>
+
+    </a>
+
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+
+        <!-- Usuario dinámico -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+
+            <div class="image">
+                <img src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/dist/img/user2-160x160.jpg"
+                    class="img-circle elevation-2"
+                    alt="User avatar"
+                    data-user-avatar>
             </div>
-            <!-- /.sidebar -->
-        </aside>
+
+            <div class="info">
+                <a href="#"
+                    class="d-block"
+                    data-user-name>
+                    Usuario
+                </a>
+            </div>
+
+        </div>
+
+
+
+        <!-- Search -->
+        <div class="form-inline">
+
+            <div class="input-group"
+                data-widget="sidebar-search">
+
+                <input class="form-control form-control-sidebar"
+                    type="search"
+                    placeholder="Buscar">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MENU DINÁMICO -->
+        <nav class="mt-2">
+
+            <ul id="sidebarMenu"
+                class="nav nav-pills nav-sidebar flex-column"
+                data-widget="treeview"
+                role="menu"
+                data-accordion="false">
+
+
+            </ul>
+
+        </nav>
+
+
+    </div>
+
+
+</aside>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

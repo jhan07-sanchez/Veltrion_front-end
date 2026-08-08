@@ -1,143 +1,140 @@
 /**
- * @fileoverview Administrador centrar de almacenamiento.
- * 
- * @description
- * Responsable de gestionar la sesion del usuario:
- * 
- * - Access token JWT
- * - Refresh token JWT
- * - Usuario autenticado
- * 
- * No contiene logica de negocio.
- * No muestra mensajes.
- * No realiza peticiones HTTP.
+ * @fileoverview
+ * Administrador centralizado del almacenamiento del ERP.
+ *
+ * Responsable únicamente de persistir información
+ * relacionada con la sesión del usuario.
  */
 
 const Storage = (() => {
-  /**
-   * Claves utilizadas en localStorage.
-   *
-   * Centralizadas para evitar errores
-   * por escritura manual.
-   */
-  const KEYS = {
+  const KEYS = Object.freeze({
     ACCESS_TOKEN: "veltrion_access_token",
-
     REFRESH_TOKEN: "veltrion_refresh_token",
-
     USER: "veltrion_user",
+    SECURITY_CONTEXT: "veltrion_security_context",
+    NAVIGATION: "veltrion_navigation",
+    DASHBOARD: "veltrion_dashboard",
+  });
+
+  /* ===========================
+       Helpers privados
+    =========================== */
+
+  const save = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
   };
 
-  /**
-   * Guarda tokens JWT.
-   *
-   * @param {string} accessToken
-   * @param {string} refreshToken
-   */
+  const read = (key) => {
+    const value = localStorage.getItem(key);
+
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  };
+
+  /* ===========================
+       Tokens
+    =========================== */
+
   const saveTokens = (accessToken, refreshToken) => {
-    localStorage.setItem(KEYS.REFRESH_TOKEN, refreshToken);
+    localStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
     localStorage.setItem(KEYS.REFRESH_TOKEN, refreshToken);
   };
 
-  /**
-   * Obtiene access token.
-   *
-   * @returns {string|null}
-   */
   const getAccessToken = () => {
     return localStorage.getItem(KEYS.ACCESS_TOKEN);
   };
 
-  /**
-   * Obtiene el refresh token.
-   *
-   * @returns {string|null}
-   */
   const getRefreshToken = () => {
     return localStorage.getItem(KEYS.REFRESH_TOKEN);
   };
 
-  /**
-   * Guarda usuario autenticado.
-   *
-   * Guarda exactamente la informacion enviada por el back-end.
-   * @param {Object} user
-   */
+  const hasAccessToken = () => {
+    return !!getAccessToken();
+  };
+
+  /* ===========================
+       Usuario
+    =========================== */
+
   const saveUser = (user) => {
-    localStorage.setItem(KEYS.USER, JSON.stringify(user));
+    save(KEYS.USER, user);
   };
 
-  /**
-   * Recupera usuario autenticado.
-   *
-   * @returns {Object|null}
-   */
   const getUser = () => {
-    const user = localStorage.getItem(KEYS.USER);
-
-    if(!user){
-        return null;
-    }
-
-    try {
-        return JSON.parse(user);
-    }catch(error){
-        return null;
-    }
+    return read(KEYS.USER);
   };
 
+  /* ===========================
+       Contexto
+    =========================== */
 
-  /**
-   * Verifica si existe sesion activa.
-   * 
-   * No valida JWT.
-   * Solo verifica almacenamiento.
-   * 
-   * @returns {boolean}
-   */
-  const hasSesion = () => {
-    return Boolean(getAccessToken());
+  const saveSecurityContext = (context) => {
+    save(KEYS.SECURITY_CONTEXT, context);
   };
 
-
-
-  /**
-   * Elimina toda la sesion.
-   */
-  const cleanSesion = () => {
-    Object.values(KEYS).forEach(key => {
-        localStorage.removeItem(key);
-    });
+  const getSecurityContext = () => {
+    return read(KEYS.SECURITY_CONTEXT);
   };
 
+  /* ===========================
+       Navegación
+    =========================== */
 
-
-  /**
-   * Devuelve toda la sesion actual.
-   * 
-   * Util para debugging.
-   * 
-   * @returns {Object}
-   */
-  const getSesion = () => {
-    return{
-        accessToken: getAccessToken(),
-        refreshToken: getRefreshToken(),
-        user: getUser()
-    };
+  const saveNavigation = (navigation) => {
+    save(KEYS.NAVIGATION, navigation);
   };
 
+  const getNavigation = () => {
+    return read(KEYS.NAVIGATION);
+  };
 
+  /* ===========================
+       Dashboard
+    =========================== */
 
-  return {
+  const saveDashboard = (dashboard) => {
+    save(KEYS.DASHBOARD, dashboard);
+  };
+
+  const getDashboard = () => {
+    return read(KEYS.DASHBOARD);
+  };
+
+  /* ===========================
+       Limpieza
+    =========================== */
+
+  const clear = () => {
+    Object.values(KEYS).forEach(localStorage.removeItem.bind(localStorage));
+  };
+
+  return Object.freeze({
     saveTokens,
     getAccessToken,
     getRefreshToken,
+    hasAccessToken,
+
     saveUser,
     getUser,
-    hasSesion,
-    cleanSesion,
-    getSesion
-  };
 
+    saveSecurityContext,
+    getSecurityContext,
+
+    saveNavigation,
+    getNavigation,
+
+    saveDashboard,
+    getDashboard,
+
+    clear,
+  });
 })();
+
+export default Storage;

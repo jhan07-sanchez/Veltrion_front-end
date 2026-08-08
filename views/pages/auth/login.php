@@ -30,37 +30,23 @@ require_once __DIR__ . '/../../../config/app.php';
                         </h1>
                     </header>
 
-                    <form id="loginForm" action="<?php echo $URL; ?>" method="POST" autocomplete="on"
-                        onsubmit="if(document.getElementById('txtUsuario').value !== 'admin' || document.getElementById('txtPassword').value !== 'admin') { alert('Usuario o contraseña de prueba incorrectos (Usa admin/admin)'); return false; }">
+                    <form id="loginForm" autocomplete="on" novalidate>
 
                         <div class="mb-3">
-                            <label for="txtUsuario" class="form-label">Usuario</label>
-                            <input type="text" id="txtUsuario" name="usuario" class="form-control"
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" id="username" autocomplete="username" class="form-control"
                                 placeholder="Ingrese su usuario" required aria-required="true">
                         </div>
 
                         <div class="mb-3">
-                            <label for="txtPassword" class="form-label">Contraseña</label>
-                            <input type="password" id="txtPassword" name="password" class="form-control"
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" id="password" class="form-control"
                                 placeholder="Ingrese su contraseña" required aria-required="true">
                         </div>
 
-                        <button type="submit" class="btn btn-principal w-100">
+                        <button id="btnLogin" type="submit" class="btn btn-principal w-100">
                             Iniciar sesión
                         </button>
-
-                        <footer class="mt-3 text-center">
-                            <div class="mb-2">
-                                <a href="registro.html" class="text-decoration-none">
-                                    Crear una cuenta
-                                </a>
-                            </div>
-                            <div>
-                                <a href="#" class="text-decoration-none text-muted">
-                                    ¿Olvidaste tu contraseña?
-                                </a>
-                            </div>
-                        </footer>
 
                     </form>
 
@@ -69,8 +55,15 @@ require_once __DIR__ . '/../../../config/app.php';
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="<?php echo $URL; ?>public/assets/js/script.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Aplicación Veltrion -->
+    <script type="module" src="<?php echo $URL; ?>public/assets/js/core/app.js"></script>
+
 </body>
 
 </html>

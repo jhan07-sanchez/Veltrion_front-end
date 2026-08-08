@@ -56,6 +56,35 @@
                 <a href="#" class="dropdown-item dropdown-footer">Ver todas las notificaciones</a>
             </div>
         </li>
+        <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle py-1" data-toggle="dropdown">
+                <img src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/dist/img/user2-160x160.jpg"
+                    class="user-image img-circle elevation-2"
+                    alt="User avatar"
+                    data-user-avatar>
+                <span class="d-none d-md-inline ml-1 font-weight-medium" data-user-name>Usuario</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow border-0 rounded-lg" style="min-width: 220px;">
+                <div class="dropdown-header p-3 text-center bg-primary text-white rounded-top">
+                    <img src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/dist/img/user2-160x160.jpg"
+                        class="img-circle elevation-2 mb-2"
+                        style="width: 70px; height: 70px; object-fit: cover;"
+                        alt="User avatar"
+                        data-user-avatar>
+                    <p class="mb-1 font-weight-bold" data-user-name>Usuario</p>
+                    <p class="text-sm text-white-50 mb-0" data-user-email>usuario@dominio.com</p>
+                </div>
+                <div class="dropdown-divider m-0"></div>
+                <div class="px-3 py-2">
+                    <button class="btn btn-outline-primary btn-sm btn-block" disabled aria-disabled="true">Perfil</button>
+                </div>
+                <div class="dropdown-divider m-0"></div>
+                <div class="px-3 py-2">
+                    <button class="btn btn-danger btn-block btn-sm" data-action="logout">Cerrar sesión</button>
+                </div>
+            </div>
+        </li>
+
         <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                 <i class="fas fa-expand-arrows-alt"></i>

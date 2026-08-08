@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
+<?php
 
-<head>
-    <meta charset="UTF-8">
-    <title>Cerrar Sesión</title>
-</head>
+require_once __DIR__ . '/config/app.php';
 
-<body>
-    <script>
-        window.location.href = "login.php";
-    </script>
-</body>
+header(
+    "Location: " . $URL . "views/pages/auth/login.php"
+);
 
-</html>
+exit;

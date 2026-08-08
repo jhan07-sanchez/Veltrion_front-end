@@ -1,14 +1,17 @@
 /**
  * @fileoverview Servicio de autenticacion.
- * 
+ *
  * @description
  * Responsable de comunicarse con los endpoint de autenticacion
  * del backend y administrar la sesion utilizando Storage.
- * 
- * No manipula intefaces.
+ *
+ * No manipula interfaces.
  * No muestra mensajes.
  * No realiza redirecciones.
  */
+
+import ApiClient from "../core/api.client.js";
+import Storage from "../storage/storage.js";
 
 const AuthService = (() => {
   /**
@@ -16,79 +19,83 @@ const AuthService = (() => {
    *
    * @param {string} username
    * @param {string} password
-   *
-   * @returns {Promise<Object>}
    */
-  const login = async (username, password) => {
-    const response = await ApiClient.post("/api/v1/auth/login", {
+  const login = async ({ username, password }) => {
+    const response = await ApiClient.post("/api/v1/auth/login/", {
       username,
       password,
     });
 
-    if (
-      response.success &&
-      response.data &&
-      response.data.access_token &&
-      response.data.refresh_token &&
-      response.data.user
-    ) {
-      Storage.saveTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-      );
-
-      Storage.saveUser(response.data.user);
+    if (!response.success || !response.data) {
+      return response;
     }
+
+    const accessToken = response.data.access_token ?? response.data.access;
+    const refreshToken = response.data.refresh_token ?? response.data.refresh;
+    const currentUser = response.data.user ?? response.data;
+
+    if (accessToken && refreshToken && currentUser) {
+      Storage.saveTokens(accessToken, refreshToken);
+      Storage.saveUser(currentUser);
+    }
+
     return response;
   };
 
   /**
-   * Obtiene el usuario autenticado.
-   *
-   * @returns {Promise<Object>}
+   * Obtiene usuario autenticado.
    */
   const me = async () => {
-    const response = await ApiClient.get("/api/v1/auth/me");
+    const response = await ApiClient.get("/api/v1/auth/me/");
 
     if (response.success && response.data) {
       Storage.saveUser(response.data);
     }
+
     return response;
   };
 
   /**
-   * Cierra la sesion.
-   */
-  const logout = () => {
-    Storage.clearSesion();
-  };
-
-  /**
-   * Verifica si existe una sesion.
+   * Cierra sesión en backend.
    *
-   * @returns {boolean}
+   * Invalida el refresh token.
+   */
+  const logout = async () => {
+    const refreshToken = Storage.getRefreshToken();
+
+    if (!refreshToken) {
+      return;
+    }
+
+    return ApiClient.post("/api/v1/auth/logout/", {
+      refresh: refreshToken,
+    });
+  };
+  /**
+   * Verifica sesión.
    */
   const isAuthenticated = () => {
-    return Storage.hasSesion();
+    return Storage.hasAccessToken();
   };
 
   /**
-   * Devuelve el usuario almacenado.
-   *
-   * @returns {Object|null}
+   * Usuario actual.
    */
   const getCurrentUser = () => {
     return Storage.getUser();
   };
 
-
-
-  return {
+  return Object.freeze({
     login,
-    logout,
-    me,
-    isAuthenticated,
-    getCurrentUser,
-  };
 
+    logout,
+
+    me,
+
+    isAuthenticated,
+
+    getCurrentUser,
+  });
 })();
+
+export default AuthService;
