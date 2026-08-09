@@ -7,6 +7,15 @@
  *
  * El backend es la única fuente de mensajes de negocio.
  * Este cliente no crea mensajes de negocio.
+ *
+ * Responsabilidades:
+ *
+ * - Ejecutar peticiones HTTP.
+ * - Adjuntar el access token.
+ * - Detectar access tokens expirados.
+ * - Renovar tokens utilizando el refresh token.
+ * - Reintentar la petición original.
+ * - Evitar múltiples refresh simultáneos.
  */
 
 import Storage from "../storage/storage.js";
@@ -15,13 +24,98 @@ const ApiClient = (() => {
   const BASE_URL = "http://127.0.0.1:8000";
 
   /**
-   * Ejecuta peticiones HTTP.
+   * Promesa compartida para evitar múltiples refresh
+   * simultáneos cuando varias peticiones reciben 401.
+   *
+   * @type {Promise<boolean> | null}
+   */
+  let refreshPromise = null;
+
+  /**
+   * Renueva los tokens utilizando el refresh token.
+   *
+   * Esta función NO utiliza request(), porque eso provocaría
+   * un ciclo de refresh potencialmente infinito.
+   *
+   * @returns {Promise<boolean>}
+   */
+  const refreshAccessToken = async () => {
+    const refreshToken = Storage.getRefreshToken();
+
+    if (!refreshToken) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/refresh/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
+      });
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (!response.ok || !result.success || !result.data) {
+        return false;
+      }
+
+      const accessToken = result.data.access_token ?? result.data.access;
+
+      const newRefreshToken = result.data.refresh_token ?? result.data.refresh;
+
+      if (!accessToken) {
+        return false;
+      }
+
+      /**
+       * SIMPLE_JWT puede rotar el refresh token.
+       *
+       * Si el backend devuelve uno nuevo, guardamos ambos.
+       * Si no devuelve uno nuevo, conservamos el existente.
+       */
+      Storage.saveTokens(accessToken, newRefreshToken ?? refreshToken);
+
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  /**
+   * Garantiza que solamente exista un refresh simultáneo.
+   *
+   * @returns {Promise<boolean>}
+   */
+  const ensureTokenRefresh = async () => {
+    if (!refreshPromise) {
+      refreshPromise = refreshAccessToken().finally(() => {
+        refreshPromise = null;
+      });
+    }
+
+    return refreshPromise;
+  };
+
+  /**
+   * Ejecuta una petición HTTP.
    *
    * @param {string} endpoint
    * @param {RequestInit} options
+   * @param {boolean} retry
    * @returns {Promise<Object>}
    */
-  const request = async (endpoint, options = {}) => {
+  const request = async (endpoint, options = {}, retry = true) => {
     const token = Storage.getAccessToken();
 
     const headers = {
@@ -50,6 +144,23 @@ const ApiClient = (() => {
         result = await response.json();
       } catch {
         result = {};
+      }
+
+      /**
+       * Access token expirado.
+       *
+       * Solamente intentamos renovar una vez.
+       */
+      if (
+        response.status === 401 &&
+        retry &&
+        !endpoint.includes("/auth/refresh/")
+      ) {
+        const refreshed = await ensureTokenRefresh();
+
+        if (refreshed) {
+          return request(endpoint, options, false);
+        }
       }
 
       return {
