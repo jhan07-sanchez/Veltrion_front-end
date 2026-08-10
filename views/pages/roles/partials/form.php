@@ -14,6 +14,29 @@
         </div>
     </div>
     <hr>
+    <hr>
+
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Permisos del rol
+            </h4>
+
+            <p class="text-muted">
+                Selecciona las operaciones que podrá realizar este rol.
+            </p>
+
+            <div id="role-permissions">
+                <div class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Cargando permisos...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
     <div class="row">
         <div class="col-12 text-right">
             <a href="<?php echo $URL; ?>views/pages/roles/index.php" class="btn btn-secondary">Cancelar</a>

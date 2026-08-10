@@ -1,0 +1,25 @@
+Veltrion_front-end
+├── config
+│   └── app.php
+├── public
+│   ├── assets
+│   │   ├── css
+│   │   ├── image
+│   │   └── js
+│   │       ├── components
+│   │       ├── config
+│   │       ├── constants
+│   │       ├── controllers
+│   │       ├── core
+│   │       ├── layout
+│   │       ├── renderers
+│   │       ├── security
+│   │       ├── services
+│   │       ├── storage
+│   │       └── utils
+│   ├── vendor
+│   └── index.php
+├── views
+│   ├── layout
+│   └── pages
+└── estructura-proyecto.tree

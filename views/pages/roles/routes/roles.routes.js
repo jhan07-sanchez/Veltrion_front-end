@@ -14,17 +14,17 @@ document.addEventListener("DOMContentLoaded", () => {
         RoleController.initForm();
     }
     else if (path.includes("roles/editar.php")) {
-        RoleController.initForm();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        if (id) {
-            const form = document.getElementById("role-form");
-            if (form) form.dataset.id = id;
-            RoleController.loadEditData(id);
-        } else {
-            alert("ID de rol no proporcionado.");
-            Routes.go("views/pages/roles/index.php");
-        }
+        RoleController.initForm().then(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (id) {
+                const form = document.getElementById("role-form");
+                if (form) form.dataset.id = id;
+                RoleController.loadEditData(id);
+            } else {
+                alert("ID de rol no proporcionado.");
+                Routes.go("views/pages/roles/index.php");
+            }
+        });
     }
 });

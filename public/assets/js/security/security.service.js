@@ -63,6 +63,10 @@ const SecurityService = (() => {
         Endpoints
     =========================================================*/
 
+  async function loadPermissionCatalog() {
+    return ApiClient.get("/api/v1/security/permissions/");
+  }
+
   async function loadContext() {
     return ApiClient.get("/api/v1/security/context/");
   }
@@ -137,6 +141,8 @@ const SecurityService = (() => {
 
   return Object.freeze({
     loadSecurity,
+
+    loadPermissionCatalog,
 
     loadContext,
 
