@@ -11,8 +11,6 @@ const UserRoleTableRenderer = (() => {
 
   function initialize(onPageChange, onAction) {
     tableBody = document.getElementById("user-roles-table-body");
-    paginationContainer = document.getElementById("user-roles-pagination");
-    onPageChangeCallback = onPageChange;
     onActionCallback = onAction;
 
     if (tableBody) {
@@ -23,18 +21,6 @@ const UserRoleTableRenderer = (() => {
         const id = btn.dataset.id;
         if (id && action && onActionCallback) {
           onActionCallback(action, id);
-        }
-      });
-    }
-
-    if (paginationContainer) {
-      paginationContainer.addEventListener("click", (e) => {
-        e.preventDefault();
-        const link = e.target.closest("a.page-link");
-        if (!link || link.parentElement.classList.contains("disabled")) return;
-        const page = link.dataset.page;
-        if (page && onPageChangeCallback) {
-          onPageChangeCallback(parseInt(page));
         }
       });
     }
@@ -66,19 +52,15 @@ const UserRoleTableRenderer = (() => {
   function renderData(data) {
     if (!tableBody) return;
 
+    if (window.$.fn.DataTable.isDataTable('#example1')) {
+      window.$('#example1').DataTable().destroy();
+    }
+
     tableBody.innerHTML = "";
 
     if (!data.results || data.results.length === 0) {
-      const row = document.createElement("tr");
-      const cell = document.createElement("td");
-      cell.colSpan = 4;
-      cell.className = "text-center text-muted py-4";
-      cell.textContent = "No se encontraron asignaciones.";
-      row.appendChild(cell);
-      tableBody.appendChild(row);
-      renderPagination(data);
-      return;
-    }
+      // DataTables will show empty message
+    } else {
 
     data.results.forEach((ur) => {
       const username = ur.username || "-";
@@ -134,23 +116,27 @@ const UserRoleTableRenderer = (() => {
       row.appendChild(actionCell);
       tableBody.appendChild(row);
     });
-
-    renderPagination(data);
-  }
-
-  function renderPagination(data) {
-    if (!paginationContainer) return;
-    const totalPages = data.total_pages || 1;
-    const currentPage = data.current_page || 1;
-    let html = `<ul class="pagination pagination-sm m-0 float-right">`;
-    html += `<li class="page-item ${!data.previous ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">&laquo;</a></li>`;
-    for (let i = 1; i <= totalPages; i++) {
-      html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
     }
-    html += `<li class="page-item ${!data.next ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">&raquo;</a></li>`;
-    html += `</ul>`;
-    paginationContainer.innerHTML = html;
+
+    try {
+      window.$("#example1").DataTable({
+        "responsive": true, 
+        "lengthChange": false, 
+        "autoWidth": false,
+        "dom": "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+               "<'row'<'col-sm-12'tr>>" +
+               "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+        "language": {
+          "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+      });
+    } catch(e) {
+      console.error("DataTables initialization error:", e);
+    }
   }
+
+  // renderPagination removed
 
   return Object.freeze({ initialize, renderLoading, renderError, renderData });
 })();

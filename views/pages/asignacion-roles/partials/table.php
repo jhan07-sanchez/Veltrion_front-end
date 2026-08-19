@@ -1,19 +1,9 @@
-<div class="card card-primary card-outline">
+<div class="card">
     <div class="card-header">
         <h3 class="card-title">Listado de Asignaciones</h3>
-        <div class="card-tools">
-            <div class="input-group input-group-sm" style="width: 250px;">
-                <input type="text" id="search-user-roles" class="form-control float-right" placeholder="Buscar asignación...">
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-default">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
-    <div class="card-body table-responsive p-0">
-        <table class="table table-hover text-nowrap">
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped dataTable dtr-inline">
             <thead>
                 <tr>
                     <th>Usuario</th>
@@ -25,7 +15,5 @@
             <tbody id="user-roles-table-body">
             </tbody>
         </table>
-    </div>
-    <div class="card-footer clearfix" id="user-roles-pagination">
     </div>
 </div>

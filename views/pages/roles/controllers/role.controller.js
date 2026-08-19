@@ -17,15 +17,13 @@ const RoleController = (() => {
   let permissionModules = [];
   async function initList() {
     RoleTableRenderer.initialize(loadPage, handleAction);
-    Utils.attachSearchControl("search-roles", () => loadPage(1));
     await loadPage(1);
   }
 
   async function loadPage(page, search = "") {
     RoleTableRenderer.renderLoading();
     try {
-      const searchInput = document.getElementById("search-roles");
-      const currentSearch = search || (searchInput ? searchInput.value : "");
+      const currentSearch = search;
       
       const response = await RoleService.list(page, currentSearch);
       

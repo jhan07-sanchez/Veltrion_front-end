@@ -14,15 +14,13 @@ const UserController = (() => {
   =============================================*/
   async function initList() {
     UserTableRenderer.initialize(loadPage, handleAction);
-    Utils.attachSearchControl("search-users", () => loadPage(1));
     await loadPage(1);
   }
 
   async function loadPage(page, search = "") {
     UserTableRenderer.renderLoading();
     try {
-      const searchInput = document.getElementById("search-users");
-      const currentSearch = search || (searchInput ? searchInput.value : "");
+      const currentSearch = search;
       
       const response = await UserService.list(page, currentSearch);
       

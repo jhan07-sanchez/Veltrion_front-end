@@ -144,7 +144,30 @@ const Routes = (() => {
     const targetPath = normalizePathname(resolveRoute(route));
     const currentPath = normalizePathname(window.location.pathname);
 
-    return currentPath === targetPath;
+    // 1. Coincidencia exacta (ej. /views/pages/usuarios/index.php === /views/pages/usuarios/index.php)
+    if (currentPath === targetPath) {
+      return true;
+    }
+
+    // 2. Coincidencia jerárquica (ej. crear.php pertenece al módulo de index.php)
+    // Extraemos el directorio padre: "/views/pages/usuarios/index.php" -> "/views/pages/usuarios"
+    const targetDir = targetPath.substring(0, targetPath.lastIndexOf('/'));
+    
+    // Evitamos que el Dashboard (ruta raíz) marque como activos a todos los submódulos
+    // ya que toda la app "empieza" con el directorio raíz.
+    const rootDir = normalizePathname(BASE_PATH);
+    if (targetDir === rootDir || targetDir === "") {
+      return false; // El Dashboard solo acepta coincidencia exacta (paso 1)
+    }
+
+    // Si la ruta del sidebar apunta al entrypoint del módulo (index.php o la carpeta base)
+    // y estamos navegando dentro de esa misma carpeta (ej: /views/pages/usuarios/crear.php)
+    if ((targetPath.endsWith("/index.php") || targetPath.endsWith("/")) && 
+        currentPath.startsWith(targetDir + "/")) {
+      return true;
+    }
+
+    return false;
   };
 
   return Object.freeze({

@@ -11,15 +11,14 @@ import Utils from "../../../../public/assets/js/core/utils.js";
 const UserRoleController = (() => {
   async function initList() {
     UserRoleTableRenderer.initialize(loadPage, handleAction);
-    Utils.attachSearchControl("search-user-roles", () => loadPage(1));
+
     await loadPage(1);
   }
 
   async function loadPage(page, search = "") {
     UserRoleTableRenderer.renderLoading();
     try {
-      const searchInput = document.getElementById("search-user-roles");
-      const currentSearch = search || (searchInput ? searchInput.value : "");
+      const currentSearch = search;
       const response = await UserRoleService.list(page, currentSearch);
       if (response.ok) {
         UserRoleTableRenderer.renderData(response.data);
