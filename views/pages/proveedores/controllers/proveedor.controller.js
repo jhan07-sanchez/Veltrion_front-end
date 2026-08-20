@@ -1,6 +1,7 @@
 import ProveedorService from "../services/proveedor.service.js";
 import ProveedorTableRenderer from "../renderers/proveedor.table.renderer.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 const ProveedorController = (() => {
   async function initList() {
@@ -34,30 +35,40 @@ const ProveedorController = (() => {
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar este proveedor?")) {
-      try {
-        const response = await ProveedorService.remove(id);
-        if (response.ok) {
-          alert("Proveedor desactivado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al desactivar el proveedor.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar este proveedor?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando proveedor...");
+      const response = await ProveedorService.remove(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
   async function confirmRestore(id) {
-    if (confirm("¿Desea restaurar este proveedor?")) {
-      try {
-        const response = await ProveedorService.restore(id);
-        if (response.ok) {
-          alert("Proveedor restaurado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al restaurar el proveedor.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Desea restaurar este proveedor?", icon: "question" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Restaurando proveedor...");
+      const response = await ProveedorService.restore(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
@@ -90,6 +101,7 @@ const ProveedorController = (() => {
         notes: document.getElementById("notes").value,
       };
 
+      NotificationService.loading("Procesando...");
       try {
         let response;
         if (id) {
@@ -99,16 +111,16 @@ const ProveedorController = (() => {
         }
 
         if (response.ok) {
-          alert(`Proveedor ${id ? 'actualizado' : 'creado'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/proveedores/index.php");
         } else {
-          alert(response.message || "Error al procesar el formulario.");
+          NotificationService.apiError(response);
           btnSubmit.disabled = false;
           spinner.classList.add("d-none");
         }
       } catch (error) {
         console.error(error);
-        alert("Error de red.");
+        NotificationService.apiError(error);
         btnSubmit.disabled = false;
         spinner.classList.add("d-none");
       }
@@ -133,12 +145,12 @@ const ProveedorController = (() => {
         document.getElementById("country").value = data.country || "";
         document.getElementById("notes").value = data.notes || "";
       } else {
-        alert("Error al cargar datos del proveedor.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/proveedores/index.php");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de red.");
+      NotificationService.apiError(error);
     }
   }
 

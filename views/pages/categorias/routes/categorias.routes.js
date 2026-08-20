@@ -1,5 +1,6 @@
 import CategoriaController from "../controllers/categoria.controller.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const path = window.location.pathname;
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (form) form.dataset.id = id;
             CategoriaController.loadEditData(id);
         } else {
-            alert("ID de categoría no proporcionado.");
+            NotificationService.error("ID de categoría no proporcionado.");
             Routes.go("views/pages/categorias/index.php");
         }
     }

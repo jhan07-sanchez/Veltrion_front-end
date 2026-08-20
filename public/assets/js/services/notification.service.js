@@ -16,6 +16,7 @@
  * Ningún otro módulo debe utilizar Swal.fire() directamente.
  * ============================================================
  */
+import SessionManager from "./session.manager.js";
 
 const NotificationService = (() => {
   /**
@@ -155,6 +156,88 @@ const NotificationService = (() => {
   }
 
   /**
+   * Éxito de API
+   */
+  function apiSuccess(response) {
+    const message = response?.message || "Operación realizada correctamente.";
+    return toast({ title: message, icon: "success" });
+  }
+
+  /**
+   * Errores de validación (400)
+   */
+  function validationError(errors) {
+    if (!errors || typeof errors !== "object") {
+      return error("Error de validación.");
+    }
+
+    let errorHtml = '<ul class="text-left mb-0">';
+    for (const [field, messages] of Object.entries(errors)) {
+      const msgs = Array.isArray(messages) ? messages : [messages];
+      msgs.forEach(msg => {
+        errorHtml += `<li><strong>${field}:</strong> ${msg}</li>`;
+      });
+    }
+    errorHtml += '</ul>';
+
+    return build({
+      icon: "warning",
+      title: "Error de validación",
+      html: errorHtml
+    });
+  }
+
+  /**
+   * Error de API
+   */
+  function apiError(response) {
+    if (response instanceof Error) {
+      return error(response.message, "Error de red");
+    }
+
+    const status = response?.status || 500;
+    const message = response?.message || "Se produjo un error inesperado.";
+
+    if (status === 401) {
+      if (
+        window.location.pathname.includes("login.php") ||
+        (response && response.code === "AUTHENTICATION_FAILED" && message.includes("incorrectos"))
+      ) {
+        return warning(message, "Error de autenticación");
+      }
+
+      return build({
+        icon: "warning",
+        title: "Sesión Expirada",
+        text: "Tu sesión ha expirado. Inicia sesión nuevamente.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        confirmButtonText: "Ir al Login"
+      }).then(async () => {
+        await SessionManager.logout();
+        window.location.replace("login.php");
+      });
+    }
+
+    if (status === 403) {
+      return error(message, "Acceso Denegado");
+    }
+
+    if (status === 400 || status === 422) {
+      if (response?.errors) {
+        return validationError(response.errors);
+      }
+      return warning(message);
+    }
+
+    if (status === 404) {
+      return warning(message, "No encontrado");
+    }
+
+    return error(message);
+  }
+
+  /**
    * API pública.
    */
   return Object.freeze({
@@ -170,5 +253,11 @@ const NotificationService = (() => {
     close,
 
     toast,
+
+    apiSuccess,
+    apiError,
+    validationError,
   });
 })();
+
+export default NotificationService;

@@ -1,5 +1,6 @@
 import UserRoleController from "../controllers/user_role.controller.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Enrutador local del módulo Asignación de Roles.
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (form) form.dataset.id = id;
                 UserRoleController.loadEditData(id);
             } else {
-                alert("ID de asignación no proporcionado.");
+                NotificationService.error("ID de asignación no proporcionado.");
                 Routes.go("views/pages/asignacion-roles/index.php");
             }
         });

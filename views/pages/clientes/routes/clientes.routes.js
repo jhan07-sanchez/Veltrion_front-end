@@ -1,5 +1,6 @@
 import ClienteController from "../controllers/cliente.controller.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const path = window.location.pathname;
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (form) form.dataset.id = id;
             ClienteController.loadEditData(id);
         } else {
-            alert("ID de cliente no proporcionado.");
+            NotificationService.error("ID de cliente no proporcionado.");
             Routes.go("views/pages/clientes/index.php");
         }
     }

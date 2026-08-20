@@ -34,11 +34,7 @@ const LogoutController = (() => {
         event.preventDefault();
 
         try {
-          console.log("[Logout] Cerrando sesión...");
-
           await SessionManager.logout();
-
-          console.log("[Logout] Sesión destruida correctamente");
 
           window.location.href = Config.BASE_PATH + Config.LOGIN_PATH;
         } catch (error) {

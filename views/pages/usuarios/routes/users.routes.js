@@ -1,5 +1,6 @@
 import UserController from "../controllers/user.controller.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Enrutador local del módulo Usuarios.
@@ -28,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             UserController.loadEditData(id);
         } else {
-            alert("ID de usuario no proporcionado.");
+            NotificationService.error("ID de usuario no proporcionado.");
             Routes.go("views/pages/usuarios/index.php");
         }
     }

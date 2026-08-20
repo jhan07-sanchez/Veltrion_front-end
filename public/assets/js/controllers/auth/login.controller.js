@@ -15,6 +15,7 @@
  */
 import AuthService from "../../services/auth.service.js";
 import SessionManager from "../../services/session.manager.js";
+import NotificationService from "../../services/notification.service.js";
 
 const LoginController = (() => {
   let form;
@@ -26,7 +27,6 @@ const LoginController = (() => {
    * Inicializa el controlador.
    */
   const init = () => {
-    console.log("LoginController iniciado");
     form = document.getElementById("loginForm");
 
     if (!form) {
@@ -48,7 +48,6 @@ const LoginController = (() => {
    */
   const onSubmit = async (event) => {
     event.preventDefault();
-    console.log("Formulario enviado");
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
 
@@ -67,6 +66,11 @@ const LoginController = (() => {
         password,
       });
 
+      if (!response.success) {
+        NotificationService.apiError(response);
+        return;
+      }
+
       /**
        * Guarda completamente la sesión.
        */
@@ -77,11 +81,7 @@ const LoginController = (() => {
        */
       window.location.replace("/Veltrion_front-end/index.php");
     } catch (error) {
-      /**
-       * No mostramos mensajes aquí.
-       * ApiClient ya propaga exactamente
-       * el mensaje enviado por el backend.
-       */
+      NotificationService.apiError(error);
       console.error(error);
     } finally {
       setLoading(false);

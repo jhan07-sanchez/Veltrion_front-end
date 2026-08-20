@@ -6,6 +6,7 @@ import Routes from "../../../../public/assets/js/core/routes.js";
 import Utils from "../../../../public/assets/js/core/utils.js";
 import SecurityService from "../../../../public/assets/js/security/security.service.js";
 import RolePermissionsRenderer from "../renderers/role-permission.renderer.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Controlador principal para Roles.
@@ -49,34 +50,40 @@ const RoleController = (() => {
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar este rol?")) {
-      try {
-        const response = await RoleService.remove(id);
-        if (response.ok) {
-          alert("Rol desactivado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al desactivar el rol.");
-        }
-      } catch (error) {
-        alert("Error de red.");
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar este rol?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando rol...");
+      const response = await RoleService.remove(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
       }
+    } catch (error) {
+      NotificationService.apiError(error);
     }
   }
 
   async function confirmRestore(id) {
-    if (confirm("¿Desea restaurar este rol?")) {
-      try {
-        const response = await RoleService.restore(id);
-        if (response.ok) {
-          alert("Rol restaurado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al restaurar el rol.");
-        }
-      } catch (error) {
-        alert("Error de red.");
+    const confirmed = await NotificationService.confirm({ text: "¿Desea restaurar este rol?", icon: "question" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Restaurando rol...");
+      const response = await RoleService.restore(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
       }
+    } catch (error) {
+      NotificationService.apiError(error);
     }
   }
 
@@ -119,6 +126,7 @@ const RoleController = (() => {
       const isEdit = !!id;
 
       RoleFormRenderer.setLoading(true);
+      NotificationService.loading("Procesando...");
       
       try {
         let response;
@@ -129,18 +137,20 @@ const RoleController = (() => {
         }
 
         if (response.ok) {
-          alert(`Rol ${isEdit ? 'actualizado' : 'creado'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/roles/index.php");
         } else {
-          if (response.data && typeof response.data === 'object') {
-             RoleFormRenderer.renderErrors(response.data);
-          } else {
-             alert(response.message || "Ocurrió un error en el servidor.");
+          if (response.status === 400 || response.status === 422) {
+             const validationErrors = response.errors || response.data;
+             if (validationErrors && typeof validationErrors === 'object') {
+                 RoleFormRenderer.renderErrors(validationErrors);
+             }
           }
+          NotificationService.apiError(response);
         }
       } catch (error) {
         console.error(error);
-        alert("Error de conexión al servidor.");
+        NotificationService.apiError(error);
       } finally {
         RoleFormRenderer.setLoading(false);
       }
@@ -157,11 +167,11 @@ const RoleController = (() => {
           RolePermissionsRenderer.render(permissionModules, response.data.permissions || {});
         }
       } else {
-        alert("No se pudo cargar la información del rol.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/roles/index.php");
       }
     } catch (error) {
-      alert("Error de conexión.");
+      NotificationService.apiError(error);
     } finally {
       RoleFormRenderer.setLoading(false);
     }

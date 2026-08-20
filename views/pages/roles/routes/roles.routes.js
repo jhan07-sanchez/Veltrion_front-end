@@ -1,5 +1,6 @@
 import RoleController from "../controllers/role.controller.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Enrutador local del módulo Roles.
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (form) form.dataset.id = id;
                 RoleController.loadEditData(id);
             } else {
-                alert("ID de rol no proporcionado.");
+                NotificationService.error("ID de rol no proporcionado.");
                 Routes.go("views/pages/roles/index.php");
             }
         });

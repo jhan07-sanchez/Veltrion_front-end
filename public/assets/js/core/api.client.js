@@ -123,7 +123,7 @@ const ApiClient = (() => {
       Accept: "application/json",
     };
 
-    if (token) {
+    if (token && !endpoint.includes("/auth/login/")) {
       headers.Authorization = `Bearer ${token}`;
     }
 
@@ -154,7 +154,8 @@ const ApiClient = (() => {
       if (
         response.status === 401 &&
         retry &&
-        !endpoint.includes("/auth/refresh/")
+        !endpoint.includes("/auth/refresh/") &&
+        !endpoint.includes("/auth/login/")
       ) {
         const refreshed = await ensureTokenRefresh();
 

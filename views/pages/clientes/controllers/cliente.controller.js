@@ -1,6 +1,7 @@
 import ClienteService from "../services/cliente.service.js";
 import ClienteTableRenderer from "../renderers/cliente.table.renderer.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 const ClienteController = (() => {
   async function initList() {
@@ -34,30 +35,40 @@ const ClienteController = (() => {
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar este cliente?")) {
-      try {
-        const response = await ClienteService.remove(id);
-        if (response.ok) {
-          alert("Cliente desactivado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al desactivar el cliente.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar este cliente?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando cliente...");
+      const response = await ClienteService.remove(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
   async function confirmRestore(id) {
-    if (confirm("¿Desea restaurar este cliente?")) {
-      try {
-        const response = await ClienteService.restore(id);
-        if (response.ok) {
-          alert("Cliente restaurado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al restaurar el cliente.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Desea restaurar este cliente?", icon: "question" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Restaurando cliente...");
+      const response = await ClienteService.restore(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
@@ -90,6 +101,7 @@ const ClienteController = (() => {
         notes: document.getElementById("notes").value,
       };
 
+      NotificationService.loading("Procesando...");
       try {
         let response;
         if (id) {
@@ -99,16 +111,16 @@ const ClienteController = (() => {
         }
 
         if (response.ok) {
-          alert(`Cliente ${id ? 'actualizado' : 'creado'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/clientes/index.php");
         } else {
-          alert(response.message || "Error al procesar el formulario.");
+          NotificationService.apiError(response);
           btnSubmit.disabled = false;
           spinner.classList.add("d-none");
         }
       } catch (error) {
         console.error(error);
-        alert("Error de red.");
+        NotificationService.apiError(error);
         btnSubmit.disabled = false;
         spinner.classList.add("d-none");
       }
@@ -133,12 +145,12 @@ const ClienteController = (() => {
         document.getElementById("country").value = data.country || "";
         document.getElementById("notes").value = data.notes || "";
       } else {
-        alert("Error al cargar datos del cliente.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/clientes/index.php");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de red.");
+      NotificationService.apiError(error);
     }
   }
 

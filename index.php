@@ -16,33 +16,20 @@ require_once __DIR__ . '/views/layout/sidebar.php';
 
         <div class="container-fluid">
 
-            <div class="row mb-2">
+            <div class="row mb-2 align-items-center border-bottom pb-2">
 
                 <div class="col-sm-6">
-
-                    <h1 class="m-0">
-                        Dashboard
-                    </h1>
-
+                    <h1 class="m-0 font-weight-bold">Dashboard</h1>
+                    <p class="text-muted mb-0">Resumen general de veltrion</p>
                 </div>
 
-
-                <div class="col-sm-6">
-
-                    <ol class="breadcrumb float-sm-right">
-
-                        <li class="breadcrumb-item">
-                            <a href="#">
-                                Home
-                            </a>
-                        </li>
-
-                        <li class="breadcrumb-item active">
-                            Dashboard
-                        </li>
-
-                    </ol>
-
+                <div class="col-sm-6 text-sm-right mt-3 mt-sm-0">
+                    <span class="text-muted mr-3" id="dashboardLastUpdated">
+                        Última actualización: --/--/---- --:--
+                    </span>
+                    <button class="btn btn-sm btn-outline-primary" id="btnRefreshDashboard">
+                        <i class="fas fa-sync-alt mr-1"></i> Actualizar
+                    </button>
                 </div>
 
             </div>

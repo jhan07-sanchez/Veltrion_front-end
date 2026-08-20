@@ -33,6 +33,8 @@
 <script src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/plugins/datatables-buttons/js/buttons.print.min.js"></script>
 <script src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
+<script src="<?php echo $URL; ?>public/assets/vendor/AdminLTE-3.2.0/plugins/chart.js/Chart.min.js"></script>
+
 <script type="module" src="<?= $URL ?>public/assets/js/core/app.js"></script>
 </body>
 

@@ -4,6 +4,7 @@ import UserTableRenderer from "../renderers/user.table.renderer.js";
 import UserFormRenderer from "../renderers/user.form.renderer.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
 import Utils from "../../../../public/assets/js/core/utils.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Controlador principal para Usuarios.
@@ -21,9 +22,9 @@ const UserController = (() => {
     UserTableRenderer.renderLoading();
     try {
       const currentSearch = search;
-      
+
       const response = await UserService.list(page, currentSearch);
-      
+
       if (response.ok) {
         UserTableRenderer.renderData(response.data);
       } else {
@@ -40,39 +41,46 @@ const UserController = (() => {
       Routes.go(`views/pages/usuarios/editar.php?id=${id}`);
     } else if (action === "delete") {
       confirmDelete(id);
-    } else if (action === "restore") {      confirmRestore(id);
+    } else if (action === "restore") {
+      confirmRestore(id);
     }
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar este usuario?")) {
-      try {
-        const response = await UserService.remove(id);
-        if (response.ok) {
-          alert("Usuario desactivado correctamente.");
-          loadPage(1); // Reload current search/page ideally, but 1 is safe
-        } else {
-          alert(response.message || "Error al desactivar el usuario.");
-        }
-      } catch (error) {
-        alert("Error de red.");
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar este usuario?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando usuario...");
+      const response = await UserService.remove(id);
+
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
       }
+    } catch (error) {
+      NotificationService.apiError(error);
     }
   }
 
   async function confirmRestore(id) {
-    if (confirm("¿Desea restaurar este usuario?")) {
-      try {
-        const response = await UserService.restore(id);
-        if (response.ok) {
-          alert("Usuario restaurado correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al restaurar el usuario.");
-        }
-      } catch (error) {
-        alert("Error de red.");
+    const confirmed = await NotificationService.confirm({ text: "¿Desea restaurar este usuario?", icon: "question" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Restaurando usuario...");
+      const response = await UserService.restore(id);
+
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
       }
+    } catch (error) {
+      NotificationService.apiError(error);
     }
   }
 
@@ -87,10 +95,10 @@ const UserController = (() => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       UserFormRenderer.clearErrors();
-      
+
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
-      
+
       // Client-side validation
       const errors = UserValidator.validateForm(data);
       if (errors) {
@@ -102,7 +110,8 @@ const UserController = (() => {
       const isEdit = !!id;
 
       UserFormRenderer.setLoading(true);
-      
+      NotificationService.loading("Procesando...");
+
       try {
         let response;
         if (isEdit) {
@@ -112,19 +121,20 @@ const UserController = (() => {
         }
 
         if (response.ok) {
-          alert(`Usuario ${isEdit ? 'actualizado' : 'creado'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/usuarios/index.php");
         } else {
-          // Si el backend devuelve errores de validacion (400 o 422)
-          if (response.data && typeof response.data === 'object') {
-             UserFormRenderer.renderErrors(response.data);
-          } else {
-             alert(response.message || "Ocurrió un error en el servidor.");
+          if (response.status === 400 || response.status === 422) {
+            const validationErrors = response.errors || response.data;
+            if (validationErrors && typeof validationErrors === 'object') {
+              UserFormRenderer.renderErrors(validationErrors);
+            }
           }
+          NotificationService.apiError(response);
         }
       } catch (error) {
         console.error(error);
-        alert("Error de conexión al servidor.");
+        NotificationService.apiError(error);
       } finally {
         UserFormRenderer.setLoading(false);
       }
@@ -138,11 +148,11 @@ const UserController = (() => {
       if (response.ok) {
         UserFormRenderer.fillData(response.data);
       } else {
-        alert("No se pudo cargar la información del usuario.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/usuarios/index.php");
       }
     } catch (error) {
-      alert("Error de conexión.");
+      NotificationService.apiError(error);
     } finally {
       UserFormRenderer.setLoading(false);
     }

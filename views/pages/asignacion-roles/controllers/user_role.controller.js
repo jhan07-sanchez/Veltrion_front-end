@@ -4,6 +4,7 @@ import UserRoleTableRenderer from "../renderers/user_role.table.renderer.js";
 import UserRoleFormRenderer from "../renderers/user_role.form.renderer.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
 import Utils from "../../../../public/assets/js/core/utils.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 /**
  * Controlador principal para UserRoles.
@@ -40,16 +41,21 @@ const UserRoleController = (() => {
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar esta asignación?")) {
-      try {
-        const response = await UserRoleService.remove(id);
-        if (response.ok) {
-          alert("Asignación desactivada correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al desactivar la asignación.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar esta asignación?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando asignación...");
+      const response = await UserRoleService.remove(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
@@ -72,6 +78,7 @@ const UserRoleController = (() => {
       const id = form.dataset.id;
       const isEdit = !!id;
       UserRoleFormRenderer.setLoading(true);
+      NotificationService.loading("Procesando...");
       
       try {
         const response = isEdit
@@ -79,18 +86,20 @@ const UserRoleController = (() => {
           : await UserRoleService.create(data);
 
         if (response.ok) {
-          alert(`Asignación ${isEdit ? 'actualizada' : 'creada'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/asignacion-roles/index.php");
         } else {
-          if (response.data && typeof response.data === 'object') {
-            UserRoleFormRenderer.renderErrors(response.data);
-          } else {
-            alert(response.message || "Ocurrió un error en el servidor.");
+          if (response.status === 400 || response.status === 422) {
+             const validationErrors = response.errors || response.data;
+             if (validationErrors && typeof validationErrors === 'object') {
+                 UserRoleFormRenderer.renderErrors(validationErrors);
+             }
           }
+          NotificationService.apiError(response);
         }
       } catch (error) {
         console.error(error);
-        alert("Error de conexión al servidor.");
+        NotificationService.apiError(error);
       } finally {
         UserRoleFormRenderer.setLoading(false);
       }
@@ -121,11 +130,14 @@ const UserRoleController = (() => {
       if (response.ok) {
         UserRoleFormRenderer.fillData(response.data);
       } else {
-        alert("No se pudo cargar la asignación.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/asignacion-roles/index.php");
       }
-    } catch (error) { alert("Error de conexión."); }
-    finally { UserRoleFormRenderer.setLoading(false); }
+    } catch (error) { 
+      NotificationService.apiError(error); 
+    } finally { 
+      UserRoleFormRenderer.setLoading(false); 
+    }
   }
 
   return Object.freeze({ initList, initForm, loadEditData });

@@ -1,6 +1,7 @@
 import CategoriaService from "../services/categoria.service.js";
 import CategoriaTableRenderer from "../renderers/categoria.table.renderer.js";
 import Routes from "../../../../public/assets/js/core/routes.js";
+import NotificationService from "../../../../public/assets/js/services/notification.service.js";
 
 const CategoriaController = (() => {
   async function initList() {
@@ -34,30 +35,40 @@ const CategoriaController = (() => {
   }
 
   async function confirmDelete(id) {
-    if (confirm("¿Está seguro de que desea desactivar esta categoría?")) {
-      try {
-        const response = await CategoriaService.remove(id);
-        if (response.ok) {
-          alert("Categoría desactivada correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al desactivar la categoría.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Está seguro de que desea desactivar esta categoría?" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Desactivando categoría...");
+      const response = await CategoriaService.remove(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
   async function confirmRestore(id) {
-    if (confirm("¿Desea restaurar esta categoría?")) {
-      try {
-        const response = await CategoriaService.restore(id);
-        if (response.ok) {
-          alert("Categoría restaurada correctamente.");
-          loadPage(1);
-        } else {
-          alert(response.message || "Error al restaurar la categoría.");
-        }
-      } catch (error) { alert("Error de red."); }
+    const confirmed = await NotificationService.confirm({ text: "¿Desea restaurar esta categoría?", icon: "question" });
+    if (!confirmed) return;
+
+    try {
+      NotificationService.loading("Restaurando categoría...");
+      const response = await CategoriaService.restore(id);
+      
+      if (response.ok) {
+        NotificationService.apiSuccess(response);
+        loadPage(1);
+      } else {
+        NotificationService.apiError(response);
+      }
+    } catch (error) { 
+      NotificationService.apiError(error); 
     }
   }
 
@@ -68,9 +79,7 @@ const CategoriaController = (() => {
     // Poblar el select de categorías padre
     try {
       const selectParent = document.getElementById("parent");
-      console.log("[Categorias] Cargando categorías padre...");
       const resCategorias = await CategoriaService.list(1, "");
-      console.log("[Categorias] Respuesta API:", resCategorias);
 
       // La API devuelve: { ok, success, data: { results: [...] } }
       let categories = [];
@@ -86,7 +95,7 @@ const CategoriaController = (() => {
         }
       }
 
-      console.log("[Categorias] Categorías encontradas:", categories.length);
+
 
       if (categories.length > 0 && selectParent) {
         let optionsHtml = '<option value="">Ninguna (Raíz)</option>';
@@ -95,7 +104,6 @@ const CategoriaController = (() => {
           optionsHtml += `<option value="${catId}">${cat.name}</option>`;
         });
         selectParent.innerHTML = optionsHtml;
-        console.log("[Categorias] Select padre poblado con", categories.length, "opciones");
       }
     } catch (e) {
       console.error("[Categorias] Error al cargar categorías padre:", e);
@@ -118,6 +126,7 @@ const CategoriaController = (() => {
         parent: parentValue ? parentValue : null,
       };
 
+      NotificationService.loading("Procesando...");
       try {
         let response;
         if (id) {
@@ -127,16 +136,16 @@ const CategoriaController = (() => {
         }
 
         if (response.ok) {
-          alert(`Categoría ${id ? 'actualizada' : 'creada'} correctamente.`);
+          NotificationService.apiSuccess(response);
           Routes.go("views/pages/categorias/index.php");
         } else {
-          alert(response.message || "Error al procesar el formulario.");
+          NotificationService.apiError(response);
           btnSubmit.disabled = false;
           spinner.classList.add("d-none");
         }
       } catch (error) {
         console.error(error);
-        alert("Error de red.");
+        NotificationService.apiError(error);
         btnSubmit.disabled = false;
         spinner.classList.add("d-none");
       }
@@ -165,12 +174,12 @@ const CategoriaController = (() => {
           parentSelect.value = typeof data.parent === 'object' ? (data.parent.id_category || data.parent.id) : data.parent;
         }
       } else {
-        alert("Error al cargar datos de la categoría.");
+        NotificationService.apiError(response);
         Routes.go("views/pages/categorias/index.php");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de red.");
+      NotificationService.apiError(error);
     }
   }
 
