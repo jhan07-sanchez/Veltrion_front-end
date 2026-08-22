@@ -17,12 +17,12 @@ const AuthService = (() => {
   /**
    * Inicia sesion.
    *
-   * @param {string} username
+   * @param {string} email
    * @param {string} password
    */
-  const login = async ({ username, password }) => {
+  const login = async ({ email, password }) => {
     const response = await ApiClient.post("/api/v1/auth/login/", {
-      username,
+      email,
       password,
     });
 

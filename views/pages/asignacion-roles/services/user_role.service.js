@@ -8,7 +8,7 @@ import RoleService from "../../roles/services/role.service.js";
  */
 const UserRoleService = (() => {
   async function list(page = 1, search = "") {
-    const queryParams = new URLSearchParams({ page });
+    const queryParams = new URLSearchParams({ page, page_size: 100 });
     if (search) {
       queryParams.append("search", search);
     }

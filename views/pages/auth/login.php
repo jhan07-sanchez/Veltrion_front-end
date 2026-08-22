@@ -33,9 +33,9 @@ require_once __DIR__ . '/../../../config/app.php';
                     <form id="loginForm" autocomplete="on" novalidate>
 
                         <div class="mb-3">
-                            <label for="username" class="form-label">Usuario</label>
-                            <input type="text" id="username" autocomplete="username" class="form-control"
-                                placeholder="Ingrese su usuario" required aria-required="true">
+                            <label for="email" class="form-label">Correo electrónico</label>
+                            <input type="email" id="email" name="email" autocomplete="email" class="form-control"
+                                placeholder="Ingrese su correo electrónico" required aria-required="true">
                         </div>
 
                         <div class="mb-3">

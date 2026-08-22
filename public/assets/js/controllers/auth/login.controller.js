@@ -19,7 +19,7 @@ import NotificationService from "../../services/notification.service.js";
 
 const LoginController = (() => {
   let form;
-  let usernameInput;
+  let emailInput;
   let passwordInput;
   let submitButton;
 
@@ -33,7 +33,7 @@ const LoginController = (() => {
       return;
     }
 
-    usernameInput = document.getElementById("username");
+    emailInput = document.getElementById("email");
     passwordInput = document.getElementById("password");
 
     submitButton = form.querySelector('button[type="submit"]');
@@ -48,10 +48,10 @@ const LoginController = (() => {
    */
   const onSubmit = async (event) => {
     event.preventDefault();
-    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return;
     }
 
@@ -62,7 +62,7 @@ const LoginController = (() => {
        * Login contra el backend.
        */
       const response = await AuthService.login({
-        username,
+        email,
         password,
       });
 

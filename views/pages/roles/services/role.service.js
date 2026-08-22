@@ -6,7 +6,7 @@ import { RolesConfig } from "../config/roles.config.js";
  */
 const RoleService = (() => {
   async function list(page = 1, search = "") {
-    const queryParams = new URLSearchParams({ page });
+    const queryParams = new URLSearchParams({ page, page_size: 100 });
     if (search) {
       queryParams.append("search", search);
     }
